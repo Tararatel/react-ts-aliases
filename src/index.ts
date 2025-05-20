@@ -14,11 +14,14 @@ interface PackageJson {
 }
 
 export function addAliases(projectRoot: string, aliases: Record<string, string[]> = {}) {
+  console.log('Starting addAliases in project:', projectRoot);
+
   const packageJsonPath = path.join(projectRoot, 'package.json');
   let packageJson: PackageJson = {};
   if (fs.existsSync(packageJsonPath)) {
     try {
       packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+      console.log('package.json found and parsed successfully');
     } catch (e) {
       console.error('Error parsing package.json:', e);
       process.exit(1);
@@ -28,45 +31,26 @@ export function addAliases(projectRoot: string, aliases: Record<string, string[]
     process.exit(1);
   }
 
-  const isLocalPackage = __filename.includes('node_modules/react-ts-aliases') || __filename.includes('work/alias-npm');
-  const isPackageInstalled = packageJson.devDependencies?.['react-ts-aliases'];
   const isTypesNodeInstalled = packageJson.devDependencies?.['@types/node'];
+  console.log('isTypesNodeInstalled:', isTypesNodeInstalled);
 
-  if (!isPackageInstalled || !isTypesNodeInstalled) {
+  if (!isTypesNodeInstalled) {
     try {
-      const dependenciesToInstall = [];
-      if (!isPackageInstalled && !isLocalPackage) {
-        dependenciesToInstall.push('react-ts-aliases');
-      }
-      if (!isTypesNodeInstalled) {
-        dependenciesToInstall.push('@types/node');
-      }
-
-      if (dependenciesToInstall.length > 0) {
-        console.log(`Installing ${dependenciesToInstall.join(' and ')} as devDependencies...`);
-        execSync(`npm install --save-dev ${dependenciesToInstall.join(' ')}`, {
-          cwd: projectRoot,
-          stdio: 'inherit',
-        });
-        console.log('Dependencies installed successfully!');
-      } else {
-        console.log('All required dependencies are already installed.');
-      }
+      console.log('Installing @types/node as devDependency...');
+      execSync('npm install --save-dev @types/node', {
+        cwd: projectRoot,
+        stdio: 'inherit',
+      });
+      console.log('@types/node installed successfully!');
     } catch (e: any) {
-      if (e.message.includes('E404') && e.message.includes('react-ts-aliases')) {
-        console.warn('Warning: react-ts-aliases not found in npm registry. This is expected during local testing.');
-        console.warn('To use this package in production, publish it to npm with "npm publish".');
-        console.warn('Continuing without installing react-ts-aliases...');
-      } else {
-        console.error('Error installing dependencies:', e);
-        process.exit(1);
-      }
+      console.error('Error installing @types/node:', e);
+      process.exit(1);
     }
   } else {
-    console.log('react-ts-aliases and @types/node are already installed in devDependencies.');
+    console.log('@types/node is already installed in devDependencies.');
   }
 
-  // Обновление tsconfig.json
+  console.log('Checking tsconfig.json...');
   const tsConfigPath = path.join(projectRoot, 'tsconfig.json');
   let tsConfig: TsConfig = {};
 
@@ -74,10 +58,14 @@ export function addAliases(projectRoot: string, aliases: Record<string, string[]
     const fileContent = fs.readFileSync(tsConfigPath, 'utf-8');
     try {
       tsConfig = JSON.parse(fileContent);
+      console.log('tsconfig.json found and parsed successfully');
     } catch (e) {
       console.error('Error parsing tsconfig.json:', e);
       process.exit(1);
     }
+  } else {
+    console.log('tsconfig.json not found, creating new one...');
+    tsConfig = {};
   }
 
   tsConfig.compilerOptions = tsConfig.compilerOptions || {};
@@ -94,6 +82,7 @@ export function addAliases(projectRoot: string, aliases: Record<string, string[]
   }
 
   try {
+    console.log('Attempting to write tsconfig.json...');
     fs.writeFileSync(tsConfigPath, JSON.stringify(tsConfig, null, 2), 'utf-8');
     console.log('Aliases added to tsconfig.json successfully!');
   } catch (e) {
@@ -101,6 +90,7 @@ export function addAliases(projectRoot: string, aliases: Record<string, string[]
     process.exit(1);
   }
 
+  console.log('Checking vite.config.ts...');
   const viteConfigPath = path.join(projectRoot, 'vite.config.ts');
   const viteConfigTemplate = `import type { AliasOptions } from 'vite';
 import { defineConfig } from 'vite';
@@ -122,6 +112,7 @@ export default defineConfig({
 
   if (!fs.existsSync(viteConfigPath)) {
     try {
+      console.log('Creating vite.config.ts...');
       fs.writeFileSync(viteConfigPath, viteConfigTemplate, 'utf-8');
       console.log('vite.config.ts created with alias configuration!');
     } catch (e) {
@@ -150,6 +141,7 @@ export default defineConfig({
         viteConfigContent.slice(0, configStart) + '\n  ' + resolveSection + '\n' + viteConfigContent.slice(configStart);
 
       try {
+        console.log('Updating vite.config.ts...');
         fs.writeFileSync(viteConfigPath, viteConfigContent, 'utf-8');
         console.log('vite.config.ts updated with alias configuration!');
       } catch (e) {

@@ -2,19 +2,9 @@
 
 `react-ts-aliases` — это CLI-инструмент для автоматического добавления путевых алиасов в проекты на React с TypeScript. Он упрощает настройку алиасов, таких как `@/*` для папки `src`, в файлах `tsconfig.json` и `vite.config.ts`, а также добавляет необходимые зависимости в `package.json`.
 
-## Установка
+## Установка и использование
 
-Установите пакет как dev-зависимость:
-
-```bash
-npm install react-ts-aliases
-```
-
-При установке пакет автоматически выполнит настройку алиасов, добавив их в `tsconfig.json` и `vite.config.ts`, а также установит зависимость `@types/node`, если она ещё не установлена.
-
-## Использование
-
-После установки пакета алиасы добавляются автоматически благодаря скрипту `postinstall`. Если вы хотите вручную запустить настройку алиасов, выполните:
+Для настройки алиасов выполните одну команду:
 
 ```bash
 npx react-ts-aliases init
@@ -31,7 +21,7 @@ npx react-ts-aliases init
   }
   ```
 - Создаёт или обновляет `vite.config.ts` с алиасом `@` для папки `src`.
-- Добавляет `react-ts-aliases` и `@types/node` в `devDependencies` в `package.json`.
+- Устанавливает `@types/node` в `devDependencies` в `package.json`, если он ещё не установлен.
 
 ## Пример
 
@@ -71,7 +61,6 @@ export default defineConfig({
 ## Зависимости
 
 Пакет автоматически устанавливает:
-- `react-ts-aliases` (в `devDependencies`)
 - `@types/node` (в `devDependencies`)
 
 ## Репозиторий
@@ -84,4 +73,4 @@ MIT License
 
 ## Автор
 
-Алексей Сидоров (tararatel)
+Алексей Сидоров
