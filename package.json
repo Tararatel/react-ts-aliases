@@ -1,0 +1,31 @@
+{
+  "name": "react-ts-aliases",
+  "version": "1.0.1",
+  "description": "A CLI tool to add path aliases to React + TypeScript projects",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "react-ts-aliases": "./bin/cli.js"
+  },
+  "scripts": {
+    "build": "npx tsc",
+    "prepublishOnly": "npm run build",
+    "postinstall": "react-ts-aliases init"
+  },
+  "keywords": [
+    "react",
+    "typescript",
+    "aliases",
+    "tsconfig"
+  ],
+  "author": "Aleksey Sidorov",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.15.19",
+    "typescript": "^5.8.3"
+  },
+  "files": [
+    "dist",
+    "bin"
+  ]
+}
